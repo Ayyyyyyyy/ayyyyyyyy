@@ -1,0 +1,23 @@
+# Cygwin Alias File
+#
+# Some ideas borrowed from:
+# https://guysherman.com/2013/11/02/my-ultimate-cygwin-setup/
+
+# Directory
+alias cdc='cd /cygdrive/c'
+alias cdh='cd /cygdrive/h'
+alias cdz='cd /cygdrive/z'
+
+alias lla='ls -alF --group-directories-first --color=always'
+alias ll='ls -l --group-directories-first --color=always'
+alias la='ls -A --group-directories-first --color=always'
+alias l='ls -CF --group-directories-first --color=always'
+alias llg='ls -alF --group-directories-first --color=always|grep'
+alias llm='ls -alF --group-directories-first --color=always|more'
+alias lll='ls -alF --group-directories-first --color=always|more'
+
+# Shell
+alias reload='source ~/.oh-my-zsh/oh-my-zsh.sh'
+
+
+
