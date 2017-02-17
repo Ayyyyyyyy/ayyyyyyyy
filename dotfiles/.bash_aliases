@@ -1,4 +1,7 @@
 ## Custom Alias ##
+## Links
+# http://brettterpstra.com/2013/03/31/a-few-more-of-my-favorite-shell-aliases/
+
 set -o notify
 
 #-------------------------------------------------------------
