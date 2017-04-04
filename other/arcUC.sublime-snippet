@@ -1,0 +1,17 @@
+<snippet>
+	<content><![CDATA[
+## ArcSight Use Case Template ##
+## Use Case: ${1}
+
+## Event Details
+deviceVendor: ${2}
+deviceProduct: ${3}
+deviceVersion: ${4}
+deviceEventClassId: ${5}
+Name: ${6}
+
+RAW: 
+
+]]></content>
+<tabTrigger>arcUC</tabTrigger>
+</snippet>
