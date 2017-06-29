@@ -7,7 +7,7 @@
 @import url(//fonts.googleapis.com/css?family=Anton); /* H1 */
 @import url(//fonts.googleapis.com/css?family=Oswald); /* H2 */
 @import url(//fonts.googleapis.com/css?family=Ubuntu+Mono); /* MonoSpace */
-@import url(http://weloveiconfonts.com/api/?family=fontelico); /* Icons */
+@import url(http://weloveiconfonts.com/api/?family=fontelico); /* Icons - http://weloveiconfonts.com/ */
 
 /* fontelico */
 [class*="fontelico-"]:before {
