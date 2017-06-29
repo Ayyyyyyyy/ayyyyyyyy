@@ -2,6 +2,50 @@
 /* Created by: M. DeVries */
 /* Insert into "Space Stylesheet" */
 
+/* Default Styles */
+body {
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857142857143;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: normal;
+    line-height: 1.25;
+    margin: 30px 0 0 0;
+}
+h2 {
+    font-size: 20px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin: 30px 0 0 0;
+}
+h3 {
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 30px 0 0 0;
+}
+h4 {
+    font-size: 14px;
+    line-height: 1.42857142857143;
+    margin: 20px 0 0 0;
+}
+h5 {
+    color: #707070;
+    font-size: 12px;
+    line-height: 1.66666666666667;
+    margin: 20px 0 0 0;
+    text-transform: uppercase;
+}
+h6 {
+    color: #707070;
+    font-size: 12px;
+    line-height: 1.66666666666667;
+    margin: 20px 0 0 0;
+}
+
 /* Code styles */
 
 code,kbd{
