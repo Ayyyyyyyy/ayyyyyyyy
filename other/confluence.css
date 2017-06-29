@@ -16,3 +16,40 @@ code,kbd{
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+/* @end Code Styles */
+
+
+/* Start of ArcSight Custom Colors */
+
+div.top {
+    font-size: 100%;
+}
+div.top table {
+    width:100%;
+    background-color: #FFFFFF;
+}
+table {
+    font-family:Ebrima;
+    font-size: 100%;
+}
+th {font-size: 95%;
+    background-color: #DDDDDD;
+    text-align: left;
+}
+th.header {
+    font-family: Ebrima;
+    font-weight:bold;
+    color: #FFFFFF;
+    background-color: #6699CC;
+}
+th.subTab {
+    font-family: Ebrima;
+    font-weight:bold;
+    color: #FFFFFF;
+    background-color: #4169E1;
+}
+td {font-size: 95%;
+    background-color: #EEEEEE;
+}
+
+/* @end ArcSight Custom Colors */
