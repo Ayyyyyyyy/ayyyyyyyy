@@ -1,0 +1,18 @@
+/* Custom Confluence CSS override */
+/* Created by: M. DeVries */
+/* Insert into "Space Stylesheet" */
+
+/* Code styles */
+
+code,kbd{
+    font-family: monospace;
+    background: #eee;
+    padding: 0 5px 2px;
+    border-radius: 4px;
+    position: relative;
+    top: -1px;
+    margin: 0 3px 0 1px;
+    font-size: 90%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
