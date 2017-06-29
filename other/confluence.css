@@ -2,68 +2,66 @@
 /* Created by: M. DeVries */
 /* Insert into "Space Stylesheet" */
 
-/* Default Styles */
-body {
-    color: #333;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.42857142857143;
+/* External Fonts */
+@import url(//fonts.googleapis.com/css?family=Open+Sans); /* Body */
+@import url(//fonts.googleapis.com/css?family=Anton); /* H1 */
+@import url(//fonts.googleapis.com/css?family=Oswald); /* H2 */
+@import url(//fonts.googleapis.com/css?family=Ubuntu+Mono); /* MonoSpace */
+
+/* ----------
+@General 
+---------- */
+
+body{
+    font-family: 'Open Sans';
+}
+h1, h2, h3 , h4, h5, h6{
+   font-family: 'Oswald';
+}
+h1{
+    font-size: 3em;
+    line-height: 1.05em;
+}
+h2{
+    font-size: 2.25em;
+    line-height: 1.25em;
+}
+h3{
+    font-size: 1.75em;
+    line-height: 1.25em;
+}
+h4{
+    font-size: 1.125em;
+    line-height: 1.22222222em;
 }
 
-h1 {
-    font-size: 24px;
-    font-weight: normal;
-    line-height: 1.25;
-    margin: 30px 0 0 0;
-}
-h2 {
-    font-size: 20px;
-    font-weight: normal;
-    line-height: 1.5;
-    margin: 30px 0 0 0;
-}
-h3 {
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 30px 0 0 0;
-}
-h4 {
-    font-size: 14px;
-    line-height: 1.42857142857143;
-    margin: 20px 0 0 0;
-}
-h5 {
-    color: #707070;
-    font-size: 12px;
-    line-height: 1.66666666666667;
-    margin: 20px 0 0 0;
-    text-transform: uppercase;
-}
-h6 {
-    color: #707070;
-    font-size: 12px;
-    line-height: 1.66666666666667;
-    margin: 20px 0 0 0;
-}
-
-/* Code styles */
+/* ----------
+@Code
+---------- */
 
 code,kbd{
-    font-family: monospace;
+    font-family: 'Ubuntu Mono';
     background: #eee;
     padding: 0 5px 2px;
     border-radius: 4px;
     position: relative;
     top: -1px;
     margin: 0 3px 0 1px;
-    font-size: 90%;
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
-/* @end Code Styles */
 
+/* ----------
+@Panel
+---------- */
 
-/* Start of ArcSight Custom Colors */
+.panel {
+    border: 0px !important;
+}
+
+/* ----------
+@Custom ArcSight Rule Export CSS
+---------- */
 
 div.top {
     font-size: 100%;
