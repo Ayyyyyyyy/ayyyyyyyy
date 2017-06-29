@@ -7,6 +7,12 @@
 @import url(//fonts.googleapis.com/css?family=Anton); /* H1 */
 @import url(//fonts.googleapis.com/css?family=Oswald); /* H2 */
 @import url(//fonts.googleapis.com/css?family=Ubuntu+Mono); /* MonoSpace */
+@import url(http://weloveiconfonts.com/api/?family=fontelico); /* Icons */
+
+/* fontelico */
+[class*="fontelico-"]:before {
+  font-family: 'fontelico', sans-serif;
+}
 
 /* ----------
 @General 
@@ -34,6 +40,7 @@ h4{
     font-size: 1.125em;
     line-height: 1.22222222em;
 }
+
 
 /* ----------
 @Code
