@@ -49,8 +49,9 @@ h4{
 
 code,kbd{
     font-family: 'Ubuntu Mono';
-    background: #eee;
-    padding: 0 5px 2px;
+    color: #c7254e;
+    background-color:#f9f2f4;
+    padding: 2px 5px;
     border-radius: 4px;
     position: relative;
     top: -1px;
@@ -74,6 +75,7 @@ code,kbd{
 .wiki-content .innerCell {
     overflow-x: inherit;
 }
+
 
 /* ----------
 @Custom ArcSight Rule Export CSS
