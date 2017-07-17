@@ -1,0 +1,90 @@
+/* SOC Style Sheet */
+/* Created by: MDV
+
+/* External Fonts */
+@import url(//fonts.googleapis.com/css?family=Open+Sans); /* Body */
+@import url(//fonts.googleapis.com/css?family=Lato); /* Body */
+@import url(//fonts.googleapis.com/css?family=Anton); /* H1 */
+@import url(//fonts.googleapis.com/css?family=Oswald); /* H2 */
+@import url(//fonts.googleapis.com/css?family=Ubuntu+Mono); /* MonoSpace */
+@import url(http://weloveiconfonts.com/api/?family=fontelico); /* Icons */
+
+/* fontelico */
+[class*="fontelico-"]:before {
+  font-family: 'fontelico', sans-serif;
+}
+
+/* ----------
+@General 
+---------- */
+
+body{
+    font-family: 'Open Sans';
+}
+h1, h2, h3 , h4, h5, h6{
+   font-family: 'Oswald';
+}
+h1{
+    font-size: 3em;
+    line-height: 1.05em;
+}
+h2{
+    font-size: 2.25em;
+    line-height: 1.25em;
+}
+h3{
+    font-size: 1.75em;
+    line-height: 1.25em;
+}
+h4{
+    font-size: 1.125em;
+    line-height: 1.22222222em;
+}
+
+/* ----------
+@Header
+---------- */
+#header .aui-header {
+    background-color:#D4D4D4;
+}
+
+.aui-header .aui-dropdown2-trigger,
+#header .aui-header .aui-nav-link ,
+#header .aui-header .aui-nav-imagelink,
+#header .aui-header a {
+    color: #0f0f0f;
+}
+
+
+/* ----------
+@Code
+---------- */
+
+code,kbd{
+    font-family: 'Ubuntu Mono';
+    color: #c7254e;
+    background-color:#f9f2f4;
+    padding: 2px 5px;
+    border-radius: 4px;
+    position: relative;
+    top: -1px;
+    margin: 0 3px 0 1px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* ----------
+@Panel
+---------- */
+
+.panel {
+    border: 0px !important;
+}
+
+/* ----------
+@Wiki Content
+---------- */
+
+.wiki-content .innerCell {
+    overflow-x: inherit;
+}
