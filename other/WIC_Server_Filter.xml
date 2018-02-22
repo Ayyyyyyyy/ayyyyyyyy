@@ -78,29 +78,31 @@
 			</Suppress>
   </Query>
   <Query Id="2" Path="Security">
-    <Select Path="Security">
-    <!-- Scheduled tasks - Supress on Local System, NT Authority (Network and Local service)
-    		4698 A scheduled task was created.
-    		4699 A Scheduled task was deleted
-			4700 A scheduled task was enabled.
-			4701 A scheduled task was disabled.
-			4702 A scheduled task was updated.
-	-->
-      	*[System[(EventID=4698 or EventID=4699 or EventID=4700 or EventID=4701 or EventID=4702)]]
-    </Select>
-    		<Suppress Path="Security">
-    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']] or <!-- Local System -->
-    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-19']] or <!-- NT Authority (Local Service) -->
-    		  	*[EventDatData[@Name='SubjectUserSid']='S-1-5-20']] <!-- NT Authority (Network Service) -->
-    		</Suppress>
+    <!-- User Data
+    		4720 New User Account Created 
+    		4722 User Account Enabled 
+    		4723 Attempt made to change pwd 
+    		4724 Attempt made to reset pwd 
+    		4725 User Account Disabled 
+    		4726 User Account Deleted 
+    -->
+    <Select Path="Security">*[System[(EventID=4720 or EventID=4722 or EventID=4723 or EventID=4724 or EventID=4725 or EventID=4726)]]</Select>
   </Query>
   <Query Id="3" Path="Security">
-	<!-- For Domain Accounts, event is created on DC.  For Local Accounts, event is created locally.
-			4740 A user account was locked out.
-			4767 A user account was unlocked.
+    <!-- Local/Global/Universal group data
+			4727 Security enabled global group created 
+			4728 A member was added to a security-enabled global group. 
+			4729 A member was removed from a security-enabled global group.
+			4730 A security-enabled global group was deleted.
+			4731 A security-enabled local group was created.
+			4732 A member was added to a security-enabled local group. 
+			4735 Security enabled local group changed
+			4737 A security-enabled global group was changed.
+			4751 A member was added to a security-disabled global group.
+			4756 A member was added to a security-enabled universal group. 
 	-->
-    <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4740 or EventID=4767)]]</Select>
-  </Query> 
+    <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4751 or EventID=4756)]]</Select>
+  </Query>
   <Query Id="4" Path="Security">
     <!-- Filtering Platform
     		5156 Allowed connection from filtering platform
@@ -172,26 +174,28 @@
     <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Eventlog']]]</Select>
   </Query>
   <Query Id="14" Path="Security">
-    <!-- Special Privileges (Admin-equivalent Access) assigned to new logon, EXCLUDING LOCAL SYSTEM
-    		4672 Special privileges assigned to new logon.
+    <Select Path="Security">
+    <!-- Scheduled tasks - Supress on Local System, NT Authority (Network and Local service)
+    		4698 A scheduled task was created.
+    		4699 A Scheduled task was deleted
+			4700 A scheduled task was enabled.
+			4701 A scheduled task was disabled.
+			4702 A scheduled task was updated.
 	-->
-    <Select Path="Security">*[System[(EventID=4672)]]</Select>
-    		<Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress> <!-- Local System -->
+      	*[System[(EventID=4698 or EventID=4699 or EventID=4700 or EventID=4701 or EventID=4702)]]
+    </Select>
+    		<Suppress Path="Security">
+    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']] or <!-- Local System -->
+    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-19']] or <!-- NT Authority (Local Service) -->
+    		  	*[EventDatData[@Name='SubjectUserSid']='S-1-5-20']] <!-- NT Authority (Network Service) -->
+    		</Suppress>
   </Query>
   <Query Id="15" Path="Security">
-    <!-- Local/Global/Universal group data
-			4727 Security enabled global group created 
-			4728 A member was added to a security-enabled global group. 
-			4729 A member was removed from a security-enabled global group.
-			4730 A security-enabled global group was deleted.
-			4731 A security-enabled local group was created.
-			4732 A member was added to a security-enabled local group. 
-			4735 Security enabled local group changed
-			4737 A security-enabled global group was changed.
-			4751 A member was added to a security-disabled global group.
-			4756 A member was added to a security-enabled universal group. 
+	<!-- For Domain Accounts, event is created on DC.  For Local Accounts, event is created locally.
+			4740 A user account was locked out.
+			4767 A user account was unlocked.
 	-->
-    <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4751 or EventID=4756)]]</Select>
+    <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4740 or EventID=4767)]]</Select>
   </Query>
   <Query Id="16" Path="Security">
     <!-- Attempt made to access an object (WriteData or addfile) 
@@ -214,15 +218,11 @@
     <Select Path="Security">*[System[(EventID=4886 or EventID=4887 or EventID=4888)]]</Select>
   </Query>
   <Query Id="19" Path="Security">
-    <!-- User Data
-    		4720 New User Account Created 
-    		4722 User Account Enabled 
-    		4723 Attempt made to change pwd 
-    		4724 Attempt made to reset pwd 
-    		4725 User Account Disabled 
-    		4726 User Account Deleted 
-    -->
-    <Select Path="Security">*[System[(EventID=4720 or EventID=4722 or EventID=4723 or EventID=4724 or EventID=4725 or EventID=4726)]]</Select>
+    <!-- Special Privileges (Admin-equivalent Access) assigned to new logon, EXCLUDING LOCAL SYSTEM
+    		4672 Special privileges assigned to new logon.
+	-->
+    <Select Path="Security">*[System[(EventID=4672)]]</Select>
+    		<Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress> <!-- Local System -->
   </Query>
   <Query Id="20" Path="Security">
   	<!-- Process Details
