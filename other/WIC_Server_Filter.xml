@@ -1,7 +1,8 @@
 <!-- 
 # Windows Server ID List
 # M. DeVries
-# Version: 1.0
+# Version: 1.1
+# 2.20.18 - Modification of formatting and addition of eventID 4634 
 # Sources:
 # - Secure Host baseline - https://github.com/iadgov/Secure-Host-Baseline
 # - Event Forwarding - https://github.com/iadgov/Event-Forwarding-Guidance
@@ -13,34 +14,38 @@
 <QueryList>
   <Query Id="0" Path="Security">
   	<!-- "High" Potential Criticality events
-  		4618	N/A	High	A monitored security event pattern has occurred.
-		4649	N/A	High	A replay attack was detected. May be a harmless false positive due to misconfiguration error.
-		4719	612	High	System audit policy was changed.
-		4765	N/A	High	SID History was added to an account.
-		4766	N/A	High	An attempt to add SID History to an account failed.
-		4794	N/A	High	An attempt was made to set the Directory Services Restore Mode.
-		4897	801	High	Role separation enabled:
-		4964	N/A	High	Special groups have been assigned to a new logon.
-		5124	N/A	High	A security setting was updated on the OCSP Responder Service
-		1102	517	Medium	The audit log was cleared
-		1100		Medium	The event logging service has shut down.
+  			4618	N/A	High	A monitored security event pattern has occurred.
+			4649	N/A	High	A replay attack was detected. May be a harmless false positive due to misconfiguration error.
+			4719	612	High	System audit policy was changed.
+			4765	N/A	High	SID History was added to an account.
+			4766	N/A	High	An attempt to add SID History to an account failed.
+			4794	N/A	High	An attempt was made to set the Directory Services Restore Mode.
+			4897	801	High	Role separation enabled:
+			4964	N/A	High	Special groups have been assigned to a new logon.
+			5124	N/A	High	A security setting was updated on the OCSP Responder Service
+			1102	517	Medium	The audit log was cleared
+			1100		Medium	The event logging service has shut down.
 	-->
   	<Select Path="Security">*[System[(EventID=4618 or EventID=4649 or EventID=4719 or EventID=4765 or EventID=4766 or EventID=4794 or EventID=4897 or EventID=4964 or EventID=5124 or EventID=1102)]]</Select>
   </Query>
   <Query Id="1" Path="Security">
     <!-- NON KERBEROS success and failed Logon
-		4624 Account Logon
-		4625 Account Failed to Logon
+			4624 Account Logon
+			4625 Account Failed to Logon
 	-->
     <Select Path="Security">
           *[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4624 or EventID=4625)]] and
           *[EventData[Data[@Name='AuthenticationPackageName'] != 'Kerberos']] and
           *[EventData[Data[@Name='TargetUserName'] != 'ANONYMOUS LOGON']]
     </Select>
-    <!-- User logoff for all non-network logon sessions-->
+    <!-- User Lofogg for all NON-NETWORK sessions.
+    		4634 Account Logoff 
+    -->
     <Select Path="Security">*[System[(EventID=4634)]] and (*[EventData[Data[@Name="LogonType"] != "3"]])
 	</Select>
-    <!-- Pass the Hash Failed Detection -->
+    <!-- Pass the Hash Failed Detection
+    		4624 Account Logon (Type 3)
+    -->
 	<Select Path="Security">
 		*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and
 		(Level=4 or Level=0) and EventID=4625]] and
@@ -49,88 +54,117 @@
 		*[EventData[Data[@Name='TargetUserName']!='ANONYMOUS LOGON']]and
 		*[EventData[Data[@Name='TargetDomainName']!='TEST']]
 	</Select>
-	<!-- Collects Logon and Logoffs of RDP -->
-	<!-- Remote Desktop Protocol Connections -->
+	<!-- Collects Logon and Logoffs of RDP
+			4624 Account Logon (Type 10)
+			4634 Account Logoff (Type 10)
+	-->
 	<Select Path="Security">
 		*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4624 or EventID=4634)]] and 
 		*[EventData[Data[@Name='LogonType']='10']] and
 		(*[EventData[Data[5]='10']] or *[EventData[Data[@Name='AuthenticationPackageName']='Negotiate']])
 	</Select>
-	<!-- Removes all service (success/failed) logons from being captured -->
-	<!-- LogonType 5 and 0 are respectively used for services and system logons. 
-	See: http://blogs.msdn.com/b/ericfitz/archive/2008/02/26/you-learn-something-new-every-day-logon-type-0.aspx 
+	<!-- Removes all service (success/failed) logons from being captured - LogonType 5 and 0 are respectively used for services and system logons.
+			4624 Account Logon (Type 5/0)
+			4625 Account Failed to Login (Type 5/0)
+			See: http://blogs.msdn.com/b/ericfitz/archive/2008/02/26/you-learn-something-new-every-day-logon-type-0.aspx 
 	-->
-	<Suppress Path="Security">
-		*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] 
-			and (Level=4 or Level=0) and (EventID=4624 or EventID=4625 or EventID=4634)]]
-		and
-		*[EventData[((Data[@Name='LogonType']='5' or Data[@Name='LogonType']='0') 
-			or Data[@Name='TargetUserName']='ANONYMOUS LOGON' 
-			or Data[@Name='TargetUserSID']='S-1-5-18')]] <!-- Local System -->
-	</Suppress>
+			<Suppress Path="Security">
+				*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] 
+					and (Level=4 or Level=0) and (EventID=4624 or EventID=4625)]]
+				and
+				*[EventData[((Data[@Name='LogonType']='5' or Data[@Name='LogonType']='0') 
+					or Data[@Name='TargetUserName']='ANONYMOUS LOGON' 
+					or Data[@Name='TargetUserSID']='S-1-5-18')]] <!-- Local System -->
+			</Suppress>
   </Query>
   <Query Id="2" Path="Security">
     <Select Path="Security">
-    <!-- Scheduled task created, modified, deleted, disabled, enabled --> 
+    <!-- Scheduled tasks - Supress on Local System, NT Authority (Network and Local service)
+    		4698 A scheduled task was created.
+    		4699 A Scheduled task was deleted
+			4700 A scheduled task was enabled.
+			4701 A scheduled task was disabled.
+			4702 A scheduled task was updated.
+	-->
       	*[System[(EventID=4698 or EventID=4699 or EventID=4700 or EventID=4701 or EventID=4702)]]
     </Select>
-    <Suppress Path="Security">
-      	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']] or <!-- Local System -->
-      	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-19']] or <!-- NT Authority (Local Service) -->
-      	*[EventDatData[@Name='SubjectUserSid']='S-1-5-20']] <!-- NT Authority (Network Service) -->
-    </Suppress>
+    		<Suppress Path="Security">
+    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']] or <!-- Local System -->
+    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-19']] or <!-- NT Authority (Local Service) -->
+    		  	*[EventDatData[@Name='SubjectUserSid']='S-1-5-20']] <!-- NT Authority (Network Service) -->
+    		</Suppress>
   </Query>
   <Query Id="3" Path="Security">
-	<!-- For Domain Accounts, event is created on DC-->
-	<!-- For Local Accounts, event is created locally-->
-	<!-- Account Lock/Unlock -->
+	<!-- For Domain Accounts, event is created on DC.  For Local Accounts, event is created locally.
+			4740 A user account was locked out.
+			4767 A user account was unlocked.
+	-->
     <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4740 or EventID=4767)]]</Select>
   </Query> 
   <Query Id="4" Path="Security">
-    <!-- Allowed Connection from filtering platform -->
+    <!-- Filtering Platform
+    		5156 Allowed connection from filtering platform
+    -->
     <Select Path="Security">*[System[(EventID=5156)]])</Select>
   </Query>
   <Query Id="5" Path="Security">
-    <!-- Invalid Hash - 5038 -->
+    <!-- Hashes
+    		5038 Invalid Hash
+     -->
     <Select Path="Security">*[System[(EventID=5038)]]</Select>
   </Query>  
   <Query Id="6" Path="Security">
-    <!-- System Time Change (4616)  -->
+    <!-- System Time
+    		4616 System Time Change
+    -->
     <Select Path="Security">*[System[(EventID=4616)]]</Select>
   </Query>
   <Query Id="7" Path="Security">
+  	<!-- Network Share Access - Supress IPC, SYSVOL, NetLogon
+  			5140 A network share object was accessed.
+	-->
     <Select Path="Security">*[System[(EventID=5140)]]</Select>
-    <!--Suppress common network noise -->
-    <Suppress Path="Security">
-    	*[EventData[Data[@Name='ShareName']='\\*\IPC$']] or <!-- IPC$ share access occurs frequently on a typical network -->
-    	*[EventData[Data[@Name='ShareName']='\\*\SYSVOL']] <!-- Domain/Group policy share that often gets accessed -->
-    	*[EventData[Data[@Name="ShareName"]='\\*\NetLogon']]
-    </Suppress>
+    		<Suppress Path="Security">
+    			*[EventData[Data[@Name='ShareName']='\\*\IPC$']] or <!-- IPC$ share access occurs frequently on a typical network -->
+    			*[EventData[Data[@Name='ShareName']='\\*\SYSVOL']] <!-- Domain/Group policy share that often gets accessed -->
+    			*[EventData[Data[@Name="ShareName"]='\\*\NetLogon']]
+    		</Suppress>
   </Query>
   <Query Id="8" Path="Security">
-    <!-- TS Session reconnect (4778), TS Session disconnect (4779) -->
+    <!-- TS Sessions
+    		4788 A session was reconnected to a Window Station.
+    		4779 A session was disconnected from a Window Station.
+	-->
    <Select Path="Security">*[System[(EventID=4778 or EventID=4779)]]</Select>
   </Query>
   <Query Id="9" Path="Security">
-    <!--  user initiated logoff -->
+    <!--  User initiated logoff
+    		4647 - User initiated logoff
+	-->
     <Select Path="Security">*[System[(EventID=4647)]]</Select>
   </Query>
   <Query Id="10" Path="Security">
     <!-- Windows Firewall Events
-		5030 The Windows Firewall Service failed to start.
-		5034 The Windows Firewall Driver was stopped.
-		5035 The Windows Firewall Driver failed to start.
-		5037 The Windows Firewall Driver detected critical runtime error. Terminating.
-		5152 The Windows Filtering Platform blocked a packet.
+			5030 The Windows Firewall Service failed to start.
+			5034 The Windows Firewall Driver was stopped.
+			5035 The Windows Firewall Driver failed to start.
+			5037 The Windows Firewall Driver detected critical runtime error. Terminating.
+			5152 The Windows Filtering Platform blocked a packet.
 	-->
     <Select Path="Security">*[System[(EventID=5030 or EventID=5034 or EventID=5035 or EventID=5037 or EventID=5152)]]</Select>
   </Query>
   <Query Id="11" Path="Security">
-    <!-- Network Share create (5142), Network Share Delete (5144)  -->
-    <Select Path="Security">*[System[(EventID=5142 or EventID=5144)]]</Select>
+  	<!-- Network Shares
+  			5142 A network share object was added.
+			5143 Network Share Modification
+			5144 Network Share Delete 
+    -->
+    <Select Path="Security">*[System[(EventID=5142 or EventID=5143 or EventID=5144)]]</Select>
   </Query>
   <Query Id="12" Path="Security">
-    <!-- Process Create (4688) -->
+    <!-- Process Creation 
+    		4688 A new process has been created.
+	-->
     <Select Path="Security">*[System[EventID=4688]]</Select>
   </Query>
   <Query Id="13" Path="Security">
@@ -138,66 +172,86 @@
     <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Eventlog']]]</Select>
   </Query>
   <Query Id="14" Path="Security">
-    <!-- Special Privileges (Admin-equivalent Access) assigned to new logon, excluding LocalSystem-->
+    <!-- Special Privileges (Admin-equivalent Access) assigned to new logon, EXCLUDING LOCAL SYSTEM
+    		4672 Special privileges assigned to new logon.
+	-->
     <Select Path="Security">*[System[(EventID=4672)]]</Select>
-    <Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress> <!-- Local Sysstem -->
+    		<Suppress Path="Security">*[EventData[Data[1]="S-1-5-18"]]</Suppress> <!-- Local System -->
   </Query>
   <Query Id="15" Path="Security">
     <!-- Local/Global/Universal group data
-		4727 Security enabled global group created 
-		4728 A member was added to a security-enabled global group. 
-		4729 A member was removed from a security-enabled global group.
-		4730 A security-enabled global group was deleted.
-		4731 A security-enabled local group was created.
-		4732 A member was added to a security-enabled local group. 
-		4735 Security enabled local group changed
-		4737 A security-enabled global group was changed.
-		4751 A member was added to a security-disabled global group.
-		4756 A member was added to a security-enabled universal group. 
+			4727 Security enabled global group created 
+			4728 A member was added to a security-enabled global group. 
+			4729 A member was removed from a security-enabled global group.
+			4730 A security-enabled global group was deleted.
+			4731 A security-enabled local group was created.
+			4732 A member was added to a security-enabled local group. 
+			4735 Security enabled local group changed
+			4737 A security-enabled global group was changed.
+			4751 A member was added to a security-disabled global group.
+			4756 A member was added to a security-enabled universal group. 
 	-->
     <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4751 or EventID=4756)]]</Select>
   </Query>
   <Query Id="16" Path="Security">
-    <!-- Attempt made to access an object (WriteData or addfile) -->
+    <!-- Attempt made to access an object (WriteData or addfile) 
+			4663 An attempt was made to access an object.
+	-->
     <Select Path="Security">*[System[(EventID=4663)]]</Select>
   </Query>
   <Query Id="17" Path="Security">
-    <!-- User removed from local Administrators group-->
+    <!-- User removed from local Administrators group
+    		4733 A member was removed from a security-enabled local group.
+	-->
     <Select Path="Security">*[System[(EventID=4733)]] and (*[EventData[Data[@Name="TargetUserName"]="Administrators"]])</Select>
   </Query>
   <Query Id="18" Path="Security">
-    <!-- Certificate Services received certificate request (4886), Approved and Certificate issued (4887), Denied request (4888) -->
+    <!-- Certificate Services
+    		4886 Certificate Services received certificate request (4886)
+    		4887 Approved and Certificate issued
+    		4888 Denied request
+    -->
     <Select Path="Security">*[System[(EventID=4886 or EventID=4887 or EventID=4888)]]</Select>
   </Query>
   <Query Id="19" Path="Security">
     <!-- User Data
-    	4720 New User Account Created 
-    	4722 User Account Enabled 
-    	4723 Attempt made to change pwd 
-    	4724 Attempt made to reset pwd 
-    	4725 User Account Disabled 
-    	4726 User Account Deleted 
+    		4720 New User Account Created 
+    		4722 User Account Enabled 
+    		4723 Attempt made to change pwd 
+    		4724 Attempt made to reset pwd 
+    		4725 User Account Disabled 
+    		4726 User Account Deleted 
     -->
     <Select Path="Security">*[System[(EventID=4720 or EventID=4722 or EventID=4723 or EventID=4724 or EventID=4725 or EventID=4726)]]</Select>
   </Query>
   <Query Id="20" Path="Security">
-    <!-- Process Terminate (4689) -->
+  	<!-- Process Details
+  			4689 Process Terminate
+  	-->
     <Select Path="Security">*[System[(EventID=4689)]]</Select>
   </Query>
   <Query Id="21" Path="Security">
+  	<!-- Logon Attempts - Excludes Specific Services (see suppression list)
+  			4648 A logon was attempted using explicit credentials.
+  	-->
   	<Select Path="Security">*[System[(EventID=4648)]]</Select>
-    <Suppress Path="Security">
-        <!-- Paths may need updating depending on configuration. -->
-        *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\taskhost.exe')]] or
-        *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\svchost.exe')]] or
-        *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\lsass.exe')]] or
-        *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\inetsrv\w3wp.exe.exe')]] or
-        *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\winlogon.exe')]] or
-        *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\services.exe')]]
-    </Suppress>
+    		<Suppress Path="Security">
+    		    <!-- Paths may need updating depending on configuration. -->
+    		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\taskhost.exe')]] or
+    		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\svchost.exe')]] or
+    		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\lsass.exe')]] or
+    		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\inetsrv\w3wp.exe.exe')]] or
+    		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\winlogon.exe')]] or
+    		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\services.exe')]]
+    		</Suppress>
   </Query>
   <Query Id="22" Path="Security">
-    <!-- Registry modified events for Operations: New Registry Value created (%%1904), Existing Registry Value modified (%%1905), Registry Value Deleted (%%1906) -->
+    <!-- Registry modified events for Operations
+    		4657 A registry value was modified.
+    			%%1904 New Registry Value created
+    			%%1905 Existing Registry Value modified
+    			%%1906 Registry Value Deleted
+	-->
     <Select Path="Security">
     	*[System[(EventID=4657)]] and 
     	((*[EventData[Data[@Name="OperationType"] = "%%1904"]]) or 
@@ -206,64 +260,99 @@
     </Select>
   </Query>
   <Query Id="23" Path="Security">
-    <!-- Logon events-->
+    <!-- Logon events
+    		4611 A trusted logon process has been registered with the Local Security Authority.This logon process will be trusted to submit logon requests.
+	-->
     <Select Path="Security">*[System[(EventID=4611)]])</Select>
   </Query>
   <Query Id="24" Path="Security">
-    <!-- Code Integrity determined that the page hashes of an image file are not valid.-->
+    <!-- Code Integrity
+    		6281 Code Integrity determined that the page hashes of an image file are not valid.
+    -->
     <Select Path="Security">*[System[(EventID=6281)]])</Select>
   </Query>
 
 <!-- Applications -->
   <Query Id="25" Path="Application">
-    <!-- User logging on with Temporary profile (1511), cannot create profile, using temporary profile (1518)-->
+    <!-- App profile Login
+			1511 User logging on with Temporary profile/ Cannot create profile
+			1518 User Logging in with a Temporary Profile
+	-->
     <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-User Profiles Service'] and (EventID=1511 or EventID=1518)]]</Select>
   </Query>
   <Query Id="26" Path="Application">
-    <!-- Application crash/hang events, similar to WER/1001. These include full path to faulting EXE/Module.-->
+    <!-- Application crash/hang events, similar to WER/1001. These include full path to faulting EXE/Module.
+    		1000 Application Crash
+    		1002 Application Hang
+    -->
     <Select Path="Application">*[System[Provider[@Name='Application Error'] and (EventID=1000)]]</Select>
     <Select Path="Application">*[System[Provider[@Name='Application Hang'] and (EventID=1002)]]</Select>
   </Query>
   <Query Id="27" Path="Application">
-    <!-- WER events for application crashes only -->
+    <!-- WER events for application crashes only
+    		App Crash
+    -->
     <Select Path="Application">*[System[Provider[@Name='Windows Error Reporting']]] and (*[EventData[Data[3] ="APPCRASH"]])</Select>
   </Query>
 
  <!-- System -->
   <Query Id="28" Path="System">
-    <!-- System startup (12 - includes OS/SP/Version) and shutdown -->
+    <!-- System Start/stop events
+    		12 System Startup
+    		13 System Shutdown
+    -->
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and (EventID=12 or EventID=13)]]</Select>
   </Query>
   <Query Id="29" Path="System">
-    <!-- Service Install (7000), service start failure (7045), new service (4697) -->
-    <Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (EventID = 7000 or EventID=7040 or EventID=7045)]]</Select>
+    <!-- Service Information
+    		7000 Service Install
+    		7040 Service Control Manager changes
+    		7045 Service Start Failure
+    		4697 New Service Created
+	-->
+    <Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (EventID=7000 or EventID=7040 or EventID=7045)]]</Select>
 	<Select Path="Security">*[System[(EventID=4697)]]</Select>
   </Query>
   <Query Id="30" Path="System">
-    <!-- Shutdown initiate requests, with user, process and reason (if supplied) -->
+    <!-- Shutdown
+    		1074 Shutdown Process Requested
+    -->
     <Select Path="System">*[System[Provider[@Name='USER32'] and (EventID=1074)]]</Select>
   </Query>
   <Query Id="31" Path="System">
-    <!-- Event log service events -->
+    <!-- Event log service events 
+    		Event Logging for Service Events 
+	-->
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Eventlog']]]</Select>
   </Query>
   <Query Id="32" Path="System">
-    <!-- Other Log cleared events (104)-->
+    <!-- Other Log cleared events
+    		104 Event Log Cleared
+	-->
     <Select Path="System">*[System[(EventID=104)]]</Select>
   </Query>
 
 <!-- Other -->
   <Query Id="33" Path="Microsoft-Windows-TaskScheduler/Operational">
-    <!-- Task scheduler Task Registered (106),  Task Registration Deleted (141), Task Deleted (142) -->
+    <!-- Task scheduler 
+    		106 Task Registered
+    		141 Task Registration Deleted
+    		142 Task Deleted
+	-->
     <Select Path="Microsoft-Windows-TaskScheduler/Operational">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
   </Query>
   <Query Id="34" Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">
-    <!-- Log attempted TS connect to remote server -->
+    <!-- Remote Server
+    		1024 TS Connect to Remote Server
+	-->
     <Select Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">*[System[(EventID=1024)]]</Select>
   </Query>
   <Query Id="35" Path="Microsoft-Windows-SMBClient/Operational">
-    <!-- get all UNC/mapped drive successful connection -->
+    <!-- Get all UNC/mapped drive successful connection 
+    		30622 UNC Path 
+    		30624 UNC Path
+	-->
     <Select Path="Microsoft-Windows-SMBClient/Operational">*[System[(EventID=30622 or EventID=30624)]]</Select>
   </Query>
 </QueryList>
