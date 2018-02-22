@@ -1,8 +1,9 @@
 <!-- 
 # Windows Server ID List
 # M. DeVries
-# Version: 1.1
-# 2.20.18 - Modification of formatting and addition of eventID 4634 
+# Version: 1.3
+# 2.20.18 - Modification of formatting and addition of eventID 4634
+# 		  - Added additional events for services. 
 # Sources:
 # - Secure Host baseline - https://github.com/iadgov/Secure-Host-Baseline
 # - Event Forwarding - https://github.com/iadgov/Event-Forwarding-Guidance
@@ -10,6 +11,7 @@
 # - Important MSFT Evts - https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l-\-events-to-monitor
 # - SID Translation - https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 # - Annotated baseline - https://docs.microsoft.com/en-us/windows/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection
+# - WEF Subscriptions - https://github.com/palantir/windows-event-forwarding/tree/master/wef-subscriptions
 -->
 <QueryList>
   <Query Id="0" Path="Security">
@@ -79,6 +81,7 @@
   </Query>
   <Query Id="2" Path="Security">
     <!-- User Data
+    		4627 Group Membership Information
     		4720 New User Account Created 
     		4722 User Account Enabled 
     		4723 Attempt made to change pwd 
@@ -86,7 +89,7 @@
     		4725 User Account Disabled 
     		4726 User Account Deleted 
     -->
-    <Select Path="Security">*[System[(EventID=4720 or EventID=4722 or EventID=4723 or EventID=4724 or EventID=4725 or EventID=4726)]]</Select>
+    <Select Path="Security">*[System[(EventID=4627 or EventID=4720 or EventID=4722 or EventID=4723 or EventID=4724 or EventID=4725 or EventID=4726)]]</Select>
   </Query>
   <Query Id="3" Path="Security">
     <!-- Local/Global/Universal group data
@@ -99,9 +102,16 @@
 			4735 Security enabled local group changed
 			4737 A security-enabled global group was changed.
 			4751 A member was added to a security-disabled global group.
-			4756 A member was added to a security-enabled universal group. 
+			4755 A security-enabled universal group was changed.
+			4756 A member was added to a security-enabled universal group.
+			4757 A security-enabled universal group was changed.
+			4764 A group's type was changed.
+			4765 SID History was added to an account.
+			4766 An attempt to add SID History to an account failed.
+			4704 A user right (privilege) was assigned.
+			4780 The ACL was set on accounts which are members of administrators group.
 	-->
-    <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4751 or EventID=4756)]]</Select>
+    <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4751 or EventID=4755 or EventID=4756 or EventID=4757 or EventID=4764 or EventID=4765 or EventID=4766 or EventID=4704 or EventID=4780)]]</Select>
   </Query>
   <Query Id="4" Path="Security">
     <!-- Filtering Platform
@@ -306,11 +316,14 @@
   <Query Id="29" Path="System">
     <!-- Service Information
     		7000 Service Install
+    		7034 Service Terminated
+    		7035 Service sent a stop/start
+    		7036 Service entered a stop/start
     		7040 Service Control Manager changes
     		7045 Service Start Failure
     		4697 New Service Created
 	-->
-    <Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (EventID=7000 or EventID=7040 or EventID=7045)]]</Select>
+    <Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (EventID=7000 or EventID=7034 or EventID=7035 or EventID=7036 or EventID=7040 or EventID=7045)]]</Select>
 	<Select Path="Security">*[System[(EventID=4697)]]</Select>
   </Query>
   <Query Id="30" Path="System">
@@ -341,6 +354,9 @@
 	-->
     <Select Path="Microsoft-Windows-TaskScheduler/Operational">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
+    		<Suppress Path="Microsoft-Windows-TaskScheduler/Operational">
+    			*[EventData[Data[@Name='TaskName']='ENTER TASKS TO FILTER OUT HERE']]
+    		</Suppress>
   </Query>
   <Query Id="34" Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">
     <!-- Remote Server
@@ -354,5 +370,14 @@
     		30624 UNC Path
 	-->
     <Select Path="Microsoft-Windows-SMBClient/Operational">*[System[(EventID=30622 or EventID=30624)]]</Select>
+  </Query>
+  <Query Id="36" Path="System">
+  	<!-- OS Logs
+  			16962 A remote call to the SAM database has been denied
+  			16968 The following client would have been normally been denied access to the SAM database
+  			16969 Remote calls to the SAM database are being restricted using the default security descriptor
+  			6008 The previous system shutdown was unexpected.
+	-->
+  	<Select Path="System">*[System[(EventID=16962 or EventID=16968 or EventID=16969 or EventID=6008)]]</Select>
   </Query>
 </QueryList>
