@@ -117,7 +117,7 @@
     <!-- Filtering Platform
     		5156 Allowed connection from filtering platform
     -->
-    <Select Path="Security">*[System[(EventID=5156)]])</Select>
+    <Select Path="Security">*[System[(EventID=5156)]]</Select>
   </Query>
   <Query Id="5" Path="Security">
     <!-- Hashes
@@ -138,7 +138,7 @@
     <Select Path="Security">*[System[(EventID=5140)]]</Select>
     		<Suppress Path="Security">
     			*[EventData[Data[@Name='ShareName']='\\*\IPC$']] or <!-- IPC$ share access occurs frequently on a typical network -->
-    			*[EventData[Data[@Name='ShareName']='\\*\SYSVOL']] <!-- Domain/Group policy share that often gets accessed -->
+    			*[EventData[Data[@Name='ShareName']='\\*\SYSVOL']] or <!-- Domain/Group policy share that often gets accessed -->
     			*[EventData[Data[@Name="ShareName"]='\\*\NetLogon']]
     		</Suppress>
   </Query>
@@ -184,20 +184,18 @@
     <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Eventlog']]]</Select>
   </Query>
   <Query Id="14" Path="Security">
-    <Select Path="Security">
     <!-- Scheduled tasks - Supress on Local System, NT Authority (Network and Local service)
-    		4698 A scheduled task was created.
-    		4699 A Scheduled task was deleted
-			4700 A scheduled task was enabled.
-			4701 A scheduled task was disabled.
-			4702 A scheduled task was updated.
-	-->
-      	*[System[(EventID=4698 or EventID=4699 or EventID=4700 or EventID=4701 or EventID=4702)]]
-    </Select>
+       4698 A scheduled task was created.
+       4699 A Scheduled task was deleted
+      4700 A scheduled task was enabled.
+      4701 A scheduled task was disabled.
+      4702 A scheduled task was updated.
+      -->
+    <Select Path="Security">*[System[(EventID=4698 or EventID=4699 or EventID=4700 or EventID=4701 or EventID=4702)]]</Select>
     		<Suppress Path="Security">
     		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']] or <!-- Local System -->
     		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-19']] or <!-- NT Authority (Local Service) -->
-    		  	*[EventDatData[@Name='SubjectUserSid']='S-1-5-20']] <!-- NT Authority (Network Service) -->
+    		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-20']] <!-- NT Authority (Network Service) -->
     		</Suppress>
   </Query>
   <Query Id="15" Path="Security">
@@ -273,13 +271,13 @@
     <!-- Logon events
     		4611 A trusted logon process has been registered with the Local Security Authority.This logon process will be trusted to submit logon requests.
 	-->
-    <Select Path="Security">*[System[(EventID=4611)]])</Select>
+    <Select Path="Security">*[System[(EventID=4611)]]</Select>
   </Query>
   <Query Id="24" Path="Security">
     <!-- Code Integrity
     		6281 Code Integrity determined that the page hashes of an image file are not valid.
     -->
-    <Select Path="Security">*[System[(EventID=6281)]])</Select>
+    <Select Path="Security">*[System[(EventID=6281)]]</Select>
   </Query>
 
 <!-- Applications -->
