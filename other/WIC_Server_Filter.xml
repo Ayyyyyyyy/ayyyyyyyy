@@ -1,9 +1,11 @@
 <!-- 
 # Windows Server ID List
 # M. DeVries
-# Version: 1.3
+# Version: 1.4
 # 2.20.18 - Modification of formatting and addition of eventID 4634
-# 		  - Added additional events for services. 
+# 		  - Added additional events for services.
+# 2.21.18 - Added Query 37/38 (badUSB).
+		  - Added 1100 to query 0.
 # Sources:
 # - Secure Host baseline - https://github.com/iadgov/Secure-Host-Baseline
 # - Event Forwarding - https://github.com/iadgov/Event-Forwarding-Guidance
@@ -28,7 +30,7 @@
 			1102	517	Medium	The audit log was cleared
 			1100		Medium	The event logging service has shut down.
 	-->
-  	<Select Path="Security">*[System[(EventID=4618 or EventID=4649 or EventID=4719 or EventID=4765 or EventID=4766 or EventID=4794 or EventID=4897 or EventID=4964 or EventID=5124 or EventID=1102)]]</Select>
+  	<Select Path="Security">*[System[(EventID=4618 or EventID=4649 or EventID=4719 or EventID=4765 or EventID=4766 or EventID=4794 or EventID=4897 or EventID=4964 or EventID=5124 or EventID=1100 or EventID=1102)]]</Select>
   </Query>
   <Query Id="1" Path="Security">
     <!-- NON KERBEROS success and failed Logon
@@ -40,7 +42,7 @@
           *[EventData[Data[@Name='AuthenticationPackageName'] != 'Kerberos']] and
           *[EventData[Data[@Name='TargetUserName'] != 'ANONYMOUS LOGON']]
     </Select>
-    <!-- User Lofogg for all NON-NETWORK sessions.
+    <!-- User Logoff for all NON-NETWORK sessions.
     		4634 Account Logoff 
     -->
     <Select Path="Security">*[System[(EventID=4634)]] and (*[EventData[Data[@Name="LogonType"] != "3"]])
@@ -101,17 +103,20 @@
 			4732 A member was added to a security-enabled local group. 
 			4735 Security enabled local group changed
 			4737 A security-enabled global group was changed.
+			4741 A Computer account was created.
+			4750 A Security Disabled Global group was changed.
 			4751 A member was added to a security-disabled global group.
+			4754 A security-enabled universal group was created. 
 			4755 A security-enabled universal group was changed.
 			4756 A member was added to a security-enabled universal group.
 			4757 A security-enabled universal group was changed.
+			4758 A security-enabled universal group was deleted.
+			4759 A security-disabled universal group was created.
 			4764 A group's type was changed.
-			4765 SID History was added to an account.
-			4766 An attempt to add SID History to an account failed.
 			4704 A user right (privilege) was assigned.
 			4780 The ACL was set on accounts which are members of administrators group.
 	-->
-    <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4751 or EventID=4755 or EventID=4756 or EventID=4757 or EventID=4764 or EventID=4765 or EventID=4766 or EventID=4704 or EventID=4780)]]</Select>
+    <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4741 or EventID=4750 or EventID=4751 or EventID=4754 EventID=4755 or EventID=4756 or EventID=4757 or EventID=4758 or EventID=4764 or EventID=4704 or EventID=4780)]]</Select>
   </Query>
   <Query Id="4" Path="Security">
     <!-- Filtering Platform
@@ -144,7 +149,7 @@
   </Query>
   <Query Id="8" Path="Security">
     <!-- TS Sessions
-    		4788 A session was reconnected to a Window Station.
+    		4778 A session was reconnected to a Window Station.
     		4779 A session was disconnected from a Window Station.
 	-->
    <Select Path="Security">*[System[(EventID=4778 or EventID=4779)]]</Select>
@@ -185,12 +190,12 @@
   </Query>
   <Query Id="14" Path="Security">
     <!-- Scheduled tasks - Supress on Local System, NT Authority (Network and Local service)
-       4698 A scheduled task was created.
-       4699 A Scheduled task was deleted
-      4700 A scheduled task was enabled.
-      4701 A scheduled task was disabled.
-      4702 A scheduled task was updated.
-      -->
+    		4698 A scheduled task was created.
+    		4699 A Scheduled task was deleted
+    		4700 A scheduled task was enabled.
+    		4701 A scheduled task was disabled.
+    		4702 A scheduled task was updated.
+    -->
     <Select Path="Security">*[System[(EventID=4698 or EventID=4699 or EventID=4700 or EventID=4701 or EventID=4702)]]</Select>
     		<Suppress Path="Security">
     		  	*[EventData[Data[@Name='SubjectUserSid']='S-1-5-18']] or <!-- Local System -->
@@ -242,7 +247,7 @@
   	<!-- Logon Attempts - Excludes Specific Services (see suppression list)
   			4648 A logon was attempted using explicit credentials.
   	-->
-  	<Select Path="Security">*[System[(EventID=4648)]]</Select>
+  	<Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and EventID=4648]]</Select>
     		<Suppress Path="Security">
     		    <!-- Paths may need updating depending on configuration. -->
     		    *[EventData[(Data[@Name='ProcessName'] = 'C:\Windows\System32\taskhost.exe')]] or
@@ -313,16 +318,26 @@
   </Query>
   <Query Id="29" Path="System">
     <!-- Service Information
-    		7000 Service Install
+    		7022 The service hung on starting
+    		7023 The service terminated with the following error
+        	7024 The service terminated with service-specific error
+        	7026 The following boot-start or system-start driver(s) failed to load
+        	7031 The service terminated unexpectedly. It has done this x time(s). The following corrective action will be taken in y milliseconds
     		7034 Service Terminated
     		7035 Service sent a stop/start
     		7036 Service entered a stop/start
-    		7040 Service Control Manager changes
-    		7045 Service Start Failure
+    		7040 Service Start Type Changed
+    		7045 Service Installed
     		4697 New Service Created
 	-->
-    <Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (EventID=7000 or EventID=7034 or EventID=7035 or EventID=7036 or EventID=7040 or EventID=7045)]]</Select>
 	<Select Path="Security">*[System[(EventID=4697)]]</Select>
+	<Select Path="System">*[System[Provider[@Name='Service Control Manager'] and (Level=1 or Level=2 or Level=3 or Level=4 or Level=0) and (EventID=7022 or EventID=7023 or EventID=7024 or EventID=7026 or EventID=7031 or EventID=7032 or EventID=7034 or EventID=7040 or EventID=7045)]]</Select>
+    		<Suppress Path="System">
+    			*[EventData[Data[@Name='param1']='Adobe Flash Player Update Service']] or
+    			*[EventData[Data[@Name='param1']='Application Experience']] or
+    			*[EventData[Data[@Name='param1']='Multimedia Class Scheduler']]
+    			<!-- *[EventData[Data[@Name='TaskName']='Uncomment and add name of task to filter out']] -->
+    		</Suppress>
   </Query>
   <Query Id="30" Path="System">
     <!-- Shutdown
@@ -353,7 +368,8 @@
     <Select Path="Microsoft-Windows-TaskScheduler/Operational">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
     		<Suppress Path="Microsoft-Windows-TaskScheduler/Operational">
-    			*[EventData[Data[@Name='TaskName']='ENTER TASKS TO FILTER OUT HERE']]
+    			*[EventData[Data[@Name='TaskName']='\UHG\DES\DESNetTriggerLaunchMgr']]
+    			<!-- *[EventData[Data[@Name='TaskName']='Uncomment and add name of task to filter out']] -->
     		</Suppress>
   </Query>
   <Query Id="34" Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">
@@ -377,5 +393,17 @@
   			6008 The previous system shutdown was unexpected.
 	-->
   	<Select Path="System">*[System[(EventID=16962 or EventID=16968 or EventID=16969 or EventID=6008)]]</Select>
+  </Query>
+  <Query Id="37" Path="System">
+  	<!-- Failed Kernel Driver Load
+			219 Failed kernel Driver
+	-->
+	<Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and Level=3 and EventID=219]]</Select>
+  </Query>
+  <Query Id="28" Path="Microsoft-Windows-DriverFrameworks-UserMode/Operational">
+    <!-- Detect User-Mode drivers loaded for potential BadUSB detection.
+        	2004 User Mode Driver
+    --->
+    <Select Path="Microsoft-Windows-DriverFrameworks-UserMode/Operational">*[System[(EventID=2004)]]</Select>
   </Query>
 </QueryList>
