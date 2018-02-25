@@ -1,3 +1,5 @@
+// https://www.windowscentral.com/how-install-bash-shell-command-line-windows-10
+// https://www.kali.org/tutorials/kali-on-the-windows-subsystem-for-linux/
 // Future versions of Hyper may add additional config options,
 // which will not automatically be merged into this file.
 // See https://hyper.is#cfg for all currently supported options.
