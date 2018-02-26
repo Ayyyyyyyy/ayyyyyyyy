@@ -3,9 +3,9 @@
 # M. DeVries
 # Version: 1.4
 # 2.20.18 - Modification of formatting and addition of eventID 4634
-#       - Added additional events for services.
+#         - Added additional events for services.
 # 2.21.18 - Added Query 37/38 (badUSB).
-      - Added 1100 to query 0.
+#         - Added 1100 to query 0.
 # Sources:
 # - Secure Host baseline - https://github.com/iadgov/Secure-Host-Baseline
 # - Event Forwarding - https://github.com/iadgov/Event-Forwarding-Guidance
