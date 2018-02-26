@@ -19,28 +19,28 @@
   <Query Id="0" Path="Security">
     <!-- "High" Potential Criticality events
         4618  N/A High  A monitored security event pattern has occurred.
-      4649  N/A High  A replay attack was detected. May be a harmless false positive due to misconfiguration error.
-      4719  612 High  System audit policy was changed.
-      4765  N/A High  SID History was added to an account.
-      4766  N/A High  An attempt to add SID History to an account failed.
-      4794  N/A High  An attempt was made to set the Directory Services Restore Mode.
-      4897  801 High  Role separation enabled:
-      4964  N/A High  Special groups have been assigned to a new logon.
-      5124  N/A High  A security setting was updated on the OCSP Responder Service
-      1102  517 Medium  The audit log was cleared
-      1100    Medium  The event logging service has shut down.
+      	4649  N/A High  A replay attack was detected. May be a harmless false positive due to misconfiguration error.
+      	4719  612 High  System audit policy was changed.
+      	4765  N/A High  SID History was added to an account.
+      	4766  N/A High  An attempt to add SID History to an account failed.
+      	4794  N/A High  An attempt was made to set the Directory Services Restore Mode.
+      	4897  801 High  Role separation enabled:
+      	4964  N/A High  Special groups have been assigned to a new logon.
+      	5124  N/A High  A security setting was updated on the OCSP Responder Service
+      	1102  517 Medium  The audit log was cleared
+      	1100    Medium  The event logging service has shut down.
   -->
     <Select Path="Security">*[System[(EventID=4618 or EventID=4649 or EventID=4719 or EventID=4765 or EventID=4766 or EventID=4794 or EventID=4897 or EventID=4964 or EventID=5124 or EventID=1100 or EventID=1102)]]</Select>
   </Query>
   <Query Id="1" Path="Security">
     <!-- NON KERBEROS success and failed Logon
-      4624 Account Logon
-      4625 Account Failed to Logon
+      	4624 Account Logon
+      	4625 Account Failed to Logon
   -->
     <Select Path="Security">
-          *[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4624 or EventID=4625)]] and
-          *[EventData[Data[@Name='AuthenticationPackageName'] != 'Kerberos']] and
-          *[EventData[Data[@Name='TargetUserName'] != 'ANONYMOUS LOGON']]
+    	*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4624 or EventID=4625)]] and
+    	*[EventData[Data[@Name='AuthenticationPackageName'] != 'Kerberos']] and
+    	*[EventData[Data[@Name='TargetUserName'] != 'ANONYMOUS LOGON']]
     </Select>
     <!-- User Logoff for all NON-NETWORK sessions.
         4634 Account Logoff 
@@ -51,34 +51,34 @@
         4624 Account Logon (Type 3)
     -->
   <Select Path="Security">
-    *[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and
-    (Level=4 or Level=0) and EventID=4625]] and
-    *[EventData[Data[@Name='LogonType']='3']] and
-    *[EventData[Data[@Name='AuthenticationPackageName']='NTLM']] and
-    *[EventData[Data[@Name='TargetUserName']!='ANONYMOUS LOGON']]and
-    *[EventData[Data[@Name='TargetDomainName']!='TEST']]
+    	*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and
+    	(Level=4 or Level=0) and EventID=4625]] and
+    	*[EventData[Data[@Name='LogonType']='3']] and
+    	*[EventData[Data[@Name='AuthenticationPackageName']='NTLM']] and
+    	*[EventData[Data[@Name='TargetUserName']!='ANONYMOUS LOGON']]and
+    	*[EventData[Data[@Name='TargetDomainName']!='TEST']]
   </Select>
   <!-- Collects Logon and Logoffs of RDP
-      4624 Account Logon (Type 10)
-      4634 Account Logoff (Type 10)
+      	4624 Account Logon (Type 10)
+      	4634 Account Logoff (Type 10)
   -->
   <Select Path="Security">
-    *[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4624 or EventID=4634)]] and 
-    *[EventData[Data[@Name='LogonType']='10']] and
-    (*[EventData[Data[5]='10']] or *[EventData[Data[@Name='AuthenticationPackageName']='Negotiate']])
+    	*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4624 or EventID=4634)]] and 
+    	*[EventData[Data[@Name='LogonType']='10']] and
+    	(*[EventData[Data[5]='10']] or *[EventData[Data[@Name='AuthenticationPackageName']='Negotiate']])
   </Select>
   <!-- Removes all service (success/failed) logons from being captured - LogonType 5 and 0 are respectively used for services and system logons.
-      4624 Account Logon (Type 5/0)
-      4625 Account Failed to Login (Type 5/0)
+      	4624 Account Logon (Type 5/0)
+      	4625 Account Failed to Login (Type 5/0)
       See: http://blogs.msdn.com/b/ericfitz/archive/2008/02/26/you-learn-something-new-every-day-logon-type-0.aspx 
   -->
       <Suppress Path="Security">
-        *[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] 
-          and (Level=4 or Level=0) and (EventID=4624 or EventID=4625)]]
-        and
-        *[EventData[((Data[@Name='LogonType']='5' or Data[@Name='LogonType']='0') 
-          or Data[@Name='TargetUserName']='ANONYMOUS LOGON' 
-          or Data[@Name='TargetUserSID']='S-1-5-18')]] <!-- Local System -->
+        	*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] 
+        	  and (Level=4 or Level=0) and (EventID=4624 or EventID=4625)]]
+        	and
+        	*[EventData[((Data[@Name='LogonType']='5' or Data[@Name='LogonType']='0') 
+        	  or Data[@Name='TargetUserName']='ANONYMOUS LOGON' 
+        	  or Data[@Name='TargetUserSID']='S-1-5-18')]] <!-- Local System -->
       </Suppress>
   </Query>
   <Query Id="2" Path="Security">
@@ -95,26 +95,26 @@
   </Query>
   <Query Id="3" Path="Security">
     <!-- Local/Global/Universal group data
-      4727 Security enabled global group created 
-      4728 A member was added to a security-enabled global group. 
-      4729 A member was removed from a security-enabled global group.
-      4730 A security-enabled global group was deleted.
-      4731 A security-enabled local group was created.
-      4732 A member was added to a security-enabled local group. 
-      4735 Security enabled local group changed
-      4737 A security-enabled global group was changed.
-      4741 A Computer account was created.
-      4750 A Security Disabled Global group was changed.
-      4751 A member was added to a security-disabled global group.
-      4754 A security-enabled universal group was created. 
-      4755 A security-enabled universal group was changed.
-      4756 A member was added to a security-enabled universal group.
-      4757 A security-enabled universal group was changed.
-      4758 A security-enabled universal group was deleted.
-      4759 A security-disabled universal group was created.
-      4764 A group's type was changed.
-      4704 A user right (privilege) was assigned.
-      4780 The ACL was set on accounts which are members of administrators group.
+    	4727 Security enabled global group created 
+    	4728 A member was added to a security-enabled global group. 
+    	4729 A member was removed from a security-enabled global group.
+    	4730 A security-enabled global group was deleted.
+    	4731 A security-enabled local group was created.
+    	4732 A member was added to a security-enabled local group. 
+    	4735 Security enabled local group changed
+    	4737 A security-enabled global group was changed.
+    	4741 A Computer account was created.
+    	4750 A Security Disabled Global group was changed.
+    	4751 A member was added to a security-disabled global group.
+    	4754 A security-enabled universal group was created. 
+    	4755 A security-enabled universal group was changed.
+    	4756 A member was added to a security-enabled universal group.
+    	4757 A security-enabled universal group was changed.
+    	4758 A security-enabled universal group was deleted.
+    	4759 A security-disabled universal group was created.
+    	4764 A group's type was changed.
+    	4704 A user right (privilege) was assigned.
+    	4780 The ACL was set on accounts which are members of administrators group.
   -->
     <Select Path="Security">*[System[(EventID=4727 or EventID=4728 or EventID=4729 or EventID=4730 or EventID=4731 or EventID=4732 or EventID=4735 or EventID=4737 or EventID=4741 or EventID=4750 or EventID=4751 or EventID=4754 or EventID=4755 or EventID=4756 or EventID=4757 or EventID=4758 or EventID=4764 or EventID=4704 or EventID=4780)]]</Select>
   </Query>
@@ -162,19 +162,19 @@
   </Query>
   <Query Id="10" Path="Security">
     <!-- Windows Firewall Events
-      5030 The Windows Firewall Service failed to start.
-      5034 The Windows Firewall Driver was stopped.
-      5035 The Windows Firewall Driver failed to start.
-      5037 The Windows Firewall Driver detected critical runtime error. Terminating.
-      5152 The Windows Filtering Platform blocked a packet.
+      	5030 The Windows Firewall Service failed to start.
+      	5034 The Windows Firewall Driver was stopped.
+      	5035 The Windows Firewall Driver failed to start.
+      	5037 The Windows Firewall Driver detected critical runtime error. Terminating.
+      	5152 The Windows Filtering Platform blocked a packet.
   -->
     <Select Path="Security">*[System[(EventID=5030 or EventID=5034 or EventID=5035 or EventID=5037 or EventID=5152)]]</Select>
   </Query>
   <Query Id="11" Path="Security">
     <!-- Network Shares
         5142 A network share object was added.
-      5143 Network Share Modification
-      5144 Network Share Delete 
+      	5143 Network Share Modification
+      	5144 Network Share Delete 
     -->
     <Select Path="Security">*[System[(EventID=5142 or EventID=5143 or EventID=5144)]]</Select>
   </Query>
@@ -205,14 +205,14 @@
   </Query>
   <Query Id="15" Path="Security">
   <!-- For Domain Accounts, event is created on DC.  For Local Accounts, event is created locally.
-      4740 A user account was locked out.
-      4767 A user account was unlocked.
+      	4740 A user account was locked out.
+      	4767 A user account was unlocked.
   -->
     <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (Level=4 or Level=0) and (EventID=4740 or EventID=4767)]]</Select>
   </Query>
   <Query Id="16" Path="Security">
     <!-- Attempt made to access an object (WriteData or addfile) 
-      4663 An attempt was made to access an object.
+      	4663 An attempt was made to access an object.
   -->
     <Select Path="Security">*[System[(EventID=4663)]]</Select>
   </Query>
@@ -288,8 +288,8 @@
 <!-- Applications -->
   <Query Id="25" Path="Application">
     <!-- App profile Login
-      1511 User logging on with Temporary profile/ Cannot create profile
-      1518 User Logging in with a Temporary Profile
+      	1511 User logging on with Temporary profile/ Cannot create profile
+      	1518 User Logging in with a Temporary Profile
   -->
     <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-User Profiles Service'] and (EventID=1511 or EventID=1518)]]</Select>
   </Query>
@@ -320,9 +320,9 @@
     <!-- Service Information
         7022 The service hung on starting
         7023 The service terminated with the following error
-          7024 The service terminated with service-specific error
-          7026 The following boot-start or system-start driver(s) failed to load
-          7031 The service terminated unexpectedly. It has done this x time(s). The following corrective action will be taken in y milliseconds
+        7024 The service terminated with service-specific error
+        7026 The following boot-start or system-start driver(s) failed to load
+        7031 The service terminated unexpectedly. It has done this x time(s). The following corrective action will be taken in y milliseconds
         7034 Service Terminated
         7035 Service sent a stop/start
         7036 Service entered a stop/start
@@ -396,13 +396,13 @@
   </Query>
   <Query Id="37" Path="System">
     <!-- Failed Kernel Driver Load
-      219 Failed kernel Driver
+      	219 Failed kernel Driver
   -->
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and Level=3 and EventID=219]]</Select>
   </Query>
   <Query Id="38" Path="Microsoft-Windows-DriverFrameworks-UserMode/Operational">
     <!-- Detect User-Mode drivers loaded - for potential BadUSB detection. 
-      2004 User Mode Driver
+    	2004 User Mode Driver
   -->
     <Select Path="Microsoft-Windows-DriverFrameworks-UserMode/Operational">*[System[(EventID=2004)]]</Select>
   </Query>
