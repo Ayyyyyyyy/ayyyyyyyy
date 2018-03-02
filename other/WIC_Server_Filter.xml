@@ -381,7 +381,7 @@
     <Select Path="Microsoft-Windows-TaskScheduler/Operational">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
     <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TaskScheduler'] and (EventID=106 or EventID=141 or EventID=142 )]]</Select>
         <Suppress Path="Microsoft-Windows-TaskScheduler/Operational">
-          *[EventData[Data[@Name='TaskName']='\UHG\DES\DESNetTriggerLaunchMgr']]
+          *[EventData[Data[@Name='TaskName']='Suppresstaskhere.exe']]
           <!-- *[EventData[Data[@Name='TaskName']='Uncomment and add name of task to filter out']] -->
         </Suppress>
   </Query>
