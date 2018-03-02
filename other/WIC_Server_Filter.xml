@@ -1,11 +1,12 @@
 <!-- 
 # Windows Server ID List
 # M. DeVries
-# Version: 1.4
+# Version: 1.5
 # 2.20.18 - Modification of formatting and addition of eventID 4634
 #         - Added additional events for services.
 # 2.21.18 - Added Query 37/38 (badUSB).
 #         - Added 1100 to query 0.
+# 3.2.18  - Added Supression to 4688 - Filter out New process' that correspond to the system account's Logon Session.
 # Sources:
 # - Secure Host baseline - https://github.com/iadgov/Secure-Host-Baseline
 # - Event Forwarding - https://github.com/iadgov/Event-Forwarding-Guidance
@@ -179,10 +180,22 @@
     <Select Path="Security">*[System[(EventID=5142 or EventID=5143 or EventID=5144)]]</Select>
   </Query>
   <Query Id="12" Path="Security">
-    <!-- Process Creation 
+    <!-- Process Creation - Filter out new process creation that corresponds with System account logon session.
+    		System Account: 0x3e7
+    		Network Service: 0x3e4
+    		Local Service: 0x3e5
+    		Read detail about account here - https://www.microsoftpressstore.com/articles/article.aspx?p=2224373&seqNum=7
         4688 A new process has been created.
   -->
     <Select Path="Security">*[System[EventID=4688]]</Select>
+    	<Suppress Path="Security">
+    		*[EventData[Data[@Name='SubjectLogonId'] = '0x3e7' and (
+    		Data[@Name='NewProcessName'] = 'C:\Windows\System32\conhost.exe' or
+    		Data[@Name='NewProcessName'] = 'C:\Windows\System32\tasklist.exe' or
+    		Data[@Name='NewProcessName'] = 'C:\Windows\System32\taskhost.exe' or
+    		Data[@Name='NewProcessName'] = 'C:\Windows\System32\sc.exe'
+    		)]]
+    	</Suppress>
   </Query>
   <Query Id="13" Path="Security">
     <!-- Event log service events specific to Security channel -->
