@@ -1,0 +1,41 @@
+<!-- 
+# Windows PowerShell Logging
+# M. DeVries
+# Version: 1.0
+# Sources:
+# - Secure Host baseline - https://github.com/iadgov/Secure-Host-Baseline
+# - Event Forwarding - https://github.com/iadgov/Event-Forwarding-Guidance
+# - Event Forwarding - https://github.com/AustralianCyberSecurityCentre/windows_event_logging
+# - Important MSFT Evts - https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l-\-events-to-monitor
+# - SID Translation - https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
+-->
+<QueryList>
+	<Query Id="0" Path="Microsoft-Windows-PowerShell/Operational">
+	    <!-- Selects PowerShell 'Script Block Tracing' (4104), PowerShell 5+ -->
+	    <Select Path="Microsoft-Windows-PowerShell/Operational">*[System[EventID=4104]]</Select>
+	    	<Suppress Path="Microsoft-Windows-PowerShell/Operational">
+	    	    <!-- Suppress common system activity -->
+	    	    *[EventData[Data[@Name='ScriptBlockText']='prompt']] or
+	    	    *[EventData[Data[@Name='ScriptBlockText']='$global:?']]
+	    	</Suppress>
+	</Query>
+
+	<Query Id="1" Path="Microsoft-Windows-PowerShell/Operational">
+    <!-- Selects PowerShell 'Script Block Tracing' (4104) warnings, PowerShell 5+ -->
+    	<Select Path="Microsoft-Windows-PowerShell/Operational">*[System[EventID=4104 and Level!=5]]</Select>
+	</Query>
+
+	<Query Id="2" Path="Microsoft-Windows-PowerShell/Operational">
+    <!-- Selects PowerShell Module Logging (4103) for Powershell 3+. -->
+    	<Select Path="Microsoft-Windows-PowerShell/Operational">*[System[EventID=4103]]</Select>
+    		<Suppress Path="Microsoft-Windows-PowerShell/Operational">
+    			<!-- Suppress Common Activity -->
+    			*[EventData[Data[@Name='Payload']='$Measure']]
+    		</Suppress>
+	</Query>
+
+	<Query Id="0" Path="Windows PowerShell">
+	<!-- Selects PowerShell engine startup events -->
+    	<Select Path="Windows PowerShell">*[System[EventID=400]]</Select> 
+	</Query>
+</QueryList>
