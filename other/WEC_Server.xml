@@ -15,6 +15,8 @@
 # - SID Translation - https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 # - Annotated baseline - https://docs.microsoft.com/en-us/windows/threat-protection/use-windows-event-forwarding-to-assist-in-intrusion-detection
 # - WEF Subscriptions - https://github.com/palantir/windows-event-forwarding/tree/master/wef-subscriptions
+# - CIS Templates - https://www.cisecurity.org/cis-benchmarks/
+# - Securing workstations - http://adsecurity.org/?p=3299
 -->
 <QueryList>
   <Query Id="0" Path="Security">
